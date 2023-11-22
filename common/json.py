@@ -47,7 +47,7 @@ class ModelEncoder(DateEncoder, QuerySetEncoder, JSONEncoder):
         #         * put it into the dictionary with that property name as
         #           the key
                 d[property] = value
-                d.update(self.get_extra_data(o))
+            d.update(self.get_extra_data(o))
             return d
         else:
             return super().default(o)

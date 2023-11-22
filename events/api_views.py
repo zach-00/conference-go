@@ -33,7 +33,7 @@ def api_list_conferences(request):
 
     return JsonResponse(
         {"conferences": conferences},
-        encoder=ConferenceDetailEncoder,
+        encoder=ConferenceListEncoder,
         )
 
 class LocationListEncoder(ModelEncoder):
@@ -114,10 +114,6 @@ def api_list_locations(request):
     }
     """
     locations = Location.objects.all()
-
-    # content = {
-    #     "locations": locations,
-    # }
 
     return JsonResponse(
         {"locations": locations},
