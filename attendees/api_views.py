@@ -122,11 +122,7 @@ def api_show_attendee(request, id):
 
         try:
             if "conference" in content:
-                href_value = content["conference"]["href"]
-                split = href_value.split("/")
-                href_index = split[3]
-                print("\n\n\n\n\n\n*******************************\n\n\n\n\n\n\n", href_index)
-                conference = Conference.objects.get(id=href_index)
+                conference = Conference.objects.get(id=content["conference"])
                 content["conference"] = conference
         except Conference.DoesNotExist:
             return JsonResponse(

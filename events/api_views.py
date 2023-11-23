@@ -39,7 +39,7 @@ def api_list_conferences(request):
             {"conferences": conferences},
             encoder=ConferenceListEncoder,
             )
-    else:
+    else: # its POST
         content = json.loads(request.body)
 
         # Get the location object and put it in the content dict
@@ -85,6 +85,8 @@ class ConferenceDetailEncoder(ModelEncoder):
         "location": LocationListEncoder(),
     }
 
+
+@require_http_methods(["GET", "PUT", "DELETE"])
 def api_show_conference(request, id):
     """
     Returns the details for the Conference model specified
@@ -110,12 +112,37 @@ def api_show_conference(request, id):
         }
     }
     """
-    conference = Conference.objects.get(id=id)
-    return JsonResponse(
-        conference,
-        encoder=ConferenceDetailEncoder,
-        safe=False
-    )
+    if request.method == "GET":
+        conference = Conference.objects.get(id=id)
+        return JsonResponse(
+            conference,
+            encoder=ConferenceDetailEncoder,
+            safe=False
+        )
+    elif request.method == "DELETE":
+        count, _ = Conference.objects.filter(id=id).delete()
+        return JsonResponse({"deleted": count > 0})
+    else: # its PUT
+
+        content = json.loads(request.body)
+        try:
+            location = Location.objects.get(id=content["location"])
+            content["location"] = location
+        except Location.DoesNotExist:
+            return JsonResponse(
+                {"message": "Invalid Location ID"},
+                status=400,
+            )
+        Conference.objects.filter(id=id).update(**content)
+        conference = Conference.objects.get(id=id)
+        return JsonResponse(
+            conference,
+            encoder=ConferenceDetailEncoder,
+            safe=False,
+        )
+
+
+
 
 
 @require_http_methods(["GET", "POST"])

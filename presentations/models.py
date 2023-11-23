@@ -47,6 +47,13 @@ class Presentation(models.Model):
         on_delete=models.CASCADE,
     )
 
+    @classmethod
+    def create(cls, **kwargs):
+        kwargs["status"] = Status.objects.get(name="SUBMITTED")
+        presentation = cls(**kwargs)
+        presentation.save()
+        return presentation
+
     def get_api_url(self):
         return reverse("api_show_presentation", kwargs={"id": self.id})
 
