@@ -3,6 +3,7 @@ from common.json import ModelEncoder
 from .models import Conference, Location, State
 from django.views.decorators.http import require_http_methods
 import json
+from .acls import get_photo
 
 
 class ConferenceListEncoder(ModelEncoder):
@@ -184,6 +185,12 @@ def api_list_locations(request):
                 {"message": "Invalid state abbreviation"},
                 status=400,
             )
+        city = content["city"]
+        # state = content["state"]
+        state_abb = state.abbreviation
+        picture = get_photo(city, state_abb)
+        # picture = get_photo(content["city"], content["state"].abbreviation)  ---> an alternate way to do the above
+        content.update(picture)
 
         location = Location.objects.create(**content)
         return JsonResponse(
@@ -202,6 +209,7 @@ class LocationDetailEncoder(ModelEncoder):
         "room_count",
         "created",
         "updated",
+        "picture_url",
     ]
     def get_extra_data(self, o):
         return { "state": o.state.abbreviation }
